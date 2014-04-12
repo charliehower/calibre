@@ -60,7 +60,7 @@ class SyntaxHighlighter(QSyntaxHighlighter):
             self.setCurrentBlockUserData(None)  # Ensure that any stale user data is discarded
             state = self.create_state(state)
             state.get_user_data, state.set_user_data = self.currentBlockUserData, self.setCurrentBlockUserData
-            for i, num, fmt in run_loop(state, self.state_map, self.formats, unicode(text)):
+            for i, num, fmt in run_loop(state, self.state_map, self.formats, text):
                 if fmt is not None:
                     self.setFormat(i, num, fmt)
             self.setCurrentBlockState(state.value)
