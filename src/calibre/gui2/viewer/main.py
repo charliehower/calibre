@@ -1016,8 +1016,7 @@ class EbookViewer(MainWindow, Ui_EbookViewer):
             self.iterator.__exit__()
         self.iterator = EbookIterator(pathtoebook)
         self.open_progress_indicator(_('Loading ebook...'))
-        worker = Worker(target=partial(self.iterator.__enter__,
-            extract_embedded_fonts_for_qt=True))
+        worker = Worker(target=self.iterator.__enter__)
         worker.start()
         while worker.isAlive():
             worker.join(0.1)
