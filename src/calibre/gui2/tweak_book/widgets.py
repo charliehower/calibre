@@ -14,7 +14,7 @@ from PyQt5.Qt import (
     QDialog, QDialogButtonBox, QGridLayout, QLabel, QLineEdit, QVBoxLayout,
     QFormLayout, QHBoxLayout, QToolButton, QIcon, QApplication, Qt, QWidget,
     QPoint, QSizePolicy, QPainter, QStaticText, pyqtSignal, QTextOption,
-    QAbstractListModel, QModelIndex, QVariant, QStyledItemDelegate, QStyle,
+    QAbstractListModel, QModelIndex, QStyledItemDelegate, QStyle,
     QListView, QTextDocument, QSize, QComboBox, QFrame, QCursor)
 
 from calibre import prepare_string_for_xml
@@ -500,7 +500,7 @@ class NamesDelegate(QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         QStyledItemDelegate.paint(self, painter, option, index)
-        text, positions = index.data(Qt.UserRole).toPyObject()
+        text, positions = index.data(Qt.UserRole)
         self.initStyleOption(option, index)
         painter.save()
         painter.setFont(option.font)
@@ -549,9 +549,9 @@ class NamesModel(QAbstractListModel):
 
     def data(self, index, role):
         if role == Qt.UserRole:
-            return QVariant(self.items[index.row()])
+            return self.items[index.row()]
         if role == Qt.DisplayRole:
-            return QVariant('\xa0' * 20)
+            return '\xa0' * 20
 
     def filter(self, query):
         query = unicode(query or '')
@@ -641,7 +641,7 @@ class InsertLink(Dialog):
         if not rows:
             self.anchor_names.model().set_names([])
         else:
-            name, positions = self.file_names.model().data(rows[0], Qt.UserRole).toPyObject()
+            name, positions = self.file_names.model().data(rows[0], Qt.UserRole)
             self.populate_anchors(name)
 
     def populate_anchors(self, name):
@@ -657,7 +657,7 @@ class InsertLink(Dialog):
         rows = list(self.file_names.selectionModel().selectedRows())
         if not rows:
             return
-        name = self.file_names.model().data(rows[0], Qt.UserRole).toPyObject()[0]
+        name = self.file_names.model().data(rows[0], Qt.UserRole)[0]
         if name == self.source_name:
             href = ''
         else:
@@ -665,7 +665,7 @@ class InsertLink(Dialog):
         frag = ''
         rows = list(self.anchor_names.selectionModel().selectedRows())
         if rows:
-            anchor = self.anchor_names.model().data(rows[0], Qt.UserRole).toPyObject()[0]
+            anchor = self.anchor_names.model().data(rows[0], Qt.UserRole)[0]
             if anchor:
                 frag = '#' + anchor
         href += frag
@@ -796,7 +796,7 @@ class InsertSemantics(Dialog):
         d.exec_()
 
     def semantic_type_changed(self):
-        item_type = unicode(self.semantic_type.itemData(self.semantic_type.currentIndex()).toString())
+        item_type = unicode(self.semantic_type.itemData(self.semantic_type.currentIndex()) or '')
         name, frag = self.final_type_map.get(item_type, (None, None))
         self.show_type(name, frag)
 
@@ -822,7 +822,7 @@ class InsertSemantics(Dialog):
 
     def target_text_changed(self):
         name, frag = unicode(self.target.text()).partition('#')[::2]
-        item_type = unicode(self.semantic_type.itemData(self.semantic_type.currentIndex()).toString())
+        item_type = unicode(self.semantic_type.itemData(self.semantic_type.currentIndex()) or '')
         self.final_type_map[item_type] = (name, frag or None)
 
     def selected_file_changed(self, *args):
@@ -830,7 +830,7 @@ class InsertSemantics(Dialog):
         if not rows:
             self.anchor_names.model().set_names([])
         else:
-            name, positions = self.file_names.model().data(rows[0], Qt.UserRole).toPyObject()
+            name, positions = self.file_names.model().data(rows[0], Qt.UserRole)
             self.populate_anchors(name)
 
     def populate_anchors(self, name):
@@ -846,12 +846,12 @@ class InsertSemantics(Dialog):
         rows = list(self.file_names.selectionModel().selectedRows())
         if not rows:
             return
-        name = self.file_names.model().data(rows[0], Qt.UserRole).toPyObject()[0]
+        name = self.file_names.model().data(rows[0], Qt.UserRole)[0]
         href = name
         frag = ''
         rows = list(self.anchor_names.selectionModel().selectedRows())
         if rows:
-            anchor = self.anchor_names.model().data(rows[0], Qt.UserRole).toPyObject()[0]
+            anchor = self.anchor_names.model().data(rows[0], Qt.UserRole)[0]
             if anchor:
                 frag = '#' + anchor
         href += frag
